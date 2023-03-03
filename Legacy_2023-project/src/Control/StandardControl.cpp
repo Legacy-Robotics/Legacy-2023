@@ -12,7 +12,7 @@
 //include subsystems below
 #include "../Subsystems/DriveTrain.hpp"
 //include commands below
-#include "../Subsystems/OmniDrive.hpp"
+#include "../Commands/OmniDrive.hpp"
 
 /*
  * NOTE: We are using the DoNotUse_getDrivers() function here
@@ -24,14 +24,15 @@ src::driversFunc drivers = src::DoNotUse_getDrivers;
 
 using namespace tap;
 using namespace tap::control;
+using namespace tap::communication::serial;
 
 //include subsystem namespaces below
-using namespace src::Drivetrain;
+using namespace src::DriveTrain;
 
 namespace StandardControl {
 
 // Define Subsystems Here
-DriveTrainSubsystem drive_train(drivers());
+src::DriveTrain::DriveTrainSubsystem drivet_train(drivers());
 // Define Commands Here
 OmniDrive omni_drive(drivers(), &drive_train);
 
@@ -49,13 +50,13 @@ void registerSubsystems(src::Drivers* drivers)
 // Initialize Subsystems with subsystem.initialize();
 void initializeSubsystems()
 {
-    drivetrain.initialize();
+    drive_train.initialize();
 }
 
 // Set Default Command with subsystem.setDefaultCommand(&command)
 void setDefaultCommands(src::Drivers* drivers)
 {
-    drivetrain.setDefaultCommand(&omni_drive);
+    drive_train.setDefaultCommand(&omni_drive);
 }
 
 // Set Commands scheduled on startup
