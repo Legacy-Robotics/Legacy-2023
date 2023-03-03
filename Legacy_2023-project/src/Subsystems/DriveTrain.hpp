@@ -23,7 +23,7 @@ namespace src::DriveTrain{
         public:
 
             static constexpr float MAX_CURRENT_OUTPUT = 10000.0f;
-            DriveTrainSubsystem(tap::Drivers* drivers) :
+            DriveTrainSubsystem(tap::Drivers *drivers) :
                 tap::control::Subsystem(drivers),
                 rightFrontMotor(drivers, RIGHT_FRONT_MOTOR_ID, MOTOR_CAN_BUS, true, "Front Right Wheel"),
                 leftFrontMotor(drivers, LEFT_FRONT_MOTOR_ID, MOTOR_CAN_BUS, false, "Front Left Wheel"),
