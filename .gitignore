@@ -1,7 +1,7 @@
 *.pyc
 
-template-project/build
-template-project/Pipfile.lock
+Legacy_2023-project/build
+Legacy_2023-project/Pipfile.lock
 project.xml.log
 
 .vscode/.cortex-debug.peripherals.state.json
