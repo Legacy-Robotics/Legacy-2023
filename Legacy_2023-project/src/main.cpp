@@ -57,33 +57,11 @@ static void initializeIo(src::Drivers *drivers);
 // called as frequently.
 static void updateIo(src::Drivers *drivers);
 
-static constexpr tap::algorithms::SmoothPidConfig MY_PID_CONFIG = {
-    .kp = 9.0f,
-    .ki = 0.0f,
-    .kd = 0.0f,
-    .maxICumulative = 0.0f,
-    .maxOutput = 3'000.0f,
-    .tQDerivativeKalman = 1.0f,
-    .tRDerivativeKalman = 0.0f,
-    .tQProportionalKalman = 1.0f,
-    .tRProportionalKalman = 0.0f,
-    .errDeadzone = 0.0f,
-    .errorDerivativeFloor = 0.1f,
-};
-
-static constexpr tap::motor::MotorId MOTOR_ID = tap::motor::MOTOR2;
-static constexpr tap::can::CanBus CAN_BUS = tap::can::CanBus::CAN_BUS1;
-static constexpr int DESIRED_RPM = 3000;
-
-    
-tap::algorithms::SmoothPid pidController(MY_PID_CONFIG);
-tap::motor::DjiMotor motor(src::DoNotUse_getDrivers(), MOTOR_ID, CAN_BUS, false, "cool motor");
-
 int main()
 {
 #ifdef PLATFORM_HOSTED
     std::cout << "Simulation starting..." << std::endl;
-#endif
+#endif /*PLATFORM HOSTED*/
 
     /*
      * NOTE: We are using DoNotUse_getDrivers here because in the main
@@ -95,8 +73,6 @@ int main()
 
     Board::initialize();
     initializeIo(drivers);
-
-    motor.initialize();
 
 #ifdef PLATFORM_HOSTED
     tap::motorsim::SimHandler::resetMotorSims();
@@ -113,13 +89,10 @@ int main()
 
         if (sendMotorTimeout.execute())
         {
-            // PROFILE(drivers->profiler, drivers->mpu6500.periodicIMUUpdate, ());
-            // PROFILE(drivers->profiler, drivers->commandScheduler.run, ());
-            // PROFILE(drivers->profiler, drivers->djiMotorTxHandler.encodeAndSendCanData, ());
-            // PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
-            pidController.runControllerDerivateError(DESIRED_RPM - motor.getShaftRPM(), 1);
-            motor.setDesiredOutput(static_cast<int32_t>(pidController.getOutput()));
-            drivers->djiMotorTxHandler.encodeAndSendCanData();
+            PROFILE(drivers->profiler, drivers->mpu6500.periodicIMUUpdate, ());
+            PROFILE(drivers->profiler, drivers->commandScheduler.run, ());
+            PROFILE(drivers->profiler, drivers->djiMotorTxHandler.encodeAndSendCanData, ());
+            PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
         }
         drivers->canRxHandler.pollCanData();
         modm::delay_us(10);
