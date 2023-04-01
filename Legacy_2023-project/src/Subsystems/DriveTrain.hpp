@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 #include "tap/control/subsystem.hpp"
 #include "tap/motor/dji_motor.hpp"
 #include "tap/communication/serial/remote.hpp"

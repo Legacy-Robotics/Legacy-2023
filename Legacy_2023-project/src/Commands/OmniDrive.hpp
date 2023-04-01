@@ -24,7 +24,7 @@ class OmniDrive : public tap::control::Command
 
         bool isFinished() const override;
 
-        const char* getName() const {return "Drivetrain Drive Command";}
+        const char* getName() const {return "OmniDrive Command";}
 
     private:
 

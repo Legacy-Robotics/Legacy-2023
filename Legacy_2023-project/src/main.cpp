@@ -44,6 +44,7 @@
 
 /* control includes ---------------------------------------------------------*/
 #include "tap/architecture/clock.hpp"
+#include "Control/StandardControl.hpp"
 
 /* define timers here -------------------------------------------------------*/
 tap::arch::PeriodicMilliTimer sendMotorTimeout(2);
@@ -69,7 +70,7 @@ int main()
      *      IO states and run the scheduler.
      */
     src::Drivers *drivers = src::DoNotUse_getDrivers();
-    drivers->can.initialize();
+    src::Control::initializeSubsystemCommands(drivers);
 
     Board::initialize();
     initializeIo(drivers);
