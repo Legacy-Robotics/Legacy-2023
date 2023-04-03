@@ -38,6 +38,7 @@ RefSerial::RefSerial(Drivers* drivers)
     : DJISerial(drivers, bound_ports::REF_SERIAL_UART_PORT),
       robotData(),
       gameData(),
+      VTMControlData(),
       receivedDpsTracker(),
       transmissionSemaphore(1)
 {
@@ -56,6 +57,11 @@ void RefSerial::messageReceiveCallback(const ReceivedSerialMessage& completeMess
     updateReceivedDamage();
     switch (completeMessage.messageType)
     {
+        case REF_MESSAGE_TYPE_VTM_CONTROL:
+        {
+            handleVTMControl(completeMessage);
+            break;
+        }
         case REF_MESSAGE_TYPE_GAME_STATUS:
         {
             decodeToGameStatus(completeMessage);
@@ -430,4 +436,21 @@ bool RefSerial::operatorBlinded() const
            (arch::clock::getTimeMilliseconds() - lastReceivedWarningRobotTime <= blindTime);
 }
 
+bool RefSerial::decodeVTMControl(const ReceivedSerialMessage& message)
+{
+    if (message.header.dataLength != 12)
+    {
+        return false;
+    }
+    robotData.robotLevel = message.data[1];
+    convertFromLittleEndian(&VTMData.mouseX, message.data);
+    convertFromLittleEndian(&VTMData.mouseY, message.data + 2);
+    convertFromLittleEndian(&VTMData.mouseWheel, message.data + 4);
+    robotData.mouseL = message.data[6];
+    robotData.mouseR = message.data[7];
+    convertFromLittleEndian(&VTMData.keys, message.data + 8);
+}
+bool RefSerial::getKey(Key k) {
+    return k & VTMData.keys; 
+}
 }  // namespace tap::communication::serial
