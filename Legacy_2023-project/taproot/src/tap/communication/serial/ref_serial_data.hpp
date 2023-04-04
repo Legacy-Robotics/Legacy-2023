@@ -106,7 +106,7 @@ public:
             B = modm::Bit15
         };
 
-        class VTMControlData {
+        struct VTMControlData {
             uint16_t mouseX;
             uint16_t mouseY;
             uint16_t mouseWheel;

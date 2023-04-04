@@ -59,7 +59,7 @@ void RefSerial::messageReceiveCallback(const ReceivedSerialMessage& completeMess
     {
         case REF_MESSAGE_TYPE_VTM_CONTROL:
         {
-            handleVTMControl(completeMessage);
+            decodeVTMControl(completeMessage);
             break;
         }
         case REF_MESSAGE_TYPE_GAME_STATUS:
@@ -442,15 +442,15 @@ bool RefSerial::decodeVTMControl(const ReceivedSerialMessage& message)
     {
         return false;
     }
-    robotData.robotLevel = message.data[1];
-    convertFromLittleEndian(&VTMData.mouseX, message.data);
-    convertFromLittleEndian(&VTMData.mouseY, message.data + 2);
-    convertFromLittleEndian(&VTMData.mouseWheel, message.data + 4);
-    robotData.mouseL = message.data[6];
-    robotData.mouseR = message.data[7];
-    convertFromLittleEndian(&VTMData.keys, message.data + 8);
+    convertFromLittleEndian(&VTMControlData.mouseX, message.data);
+    convertFromLittleEndian(&VTMControlData.mouseY, message.data + 2);
+    convertFromLittleEndian(&VTMControlData.mouseWheel, message.data + 4);
+    VTMControlData.mouseL = message.data[6];
+    VTMControlData.mouseR = message.data[7];
+    convertFromLittleEndian(&VTMControlData.keys, message.data + 8);
+    return true;
 }
-bool RefSerial::getKey(Key k) {
-    return k & VTMData.keys; 
+bool RefSerial::getKey(Rx::Key k) {
+    return static_cast<uint16_t>(k) & static_cast<uint16_t>(VTMControlData.keys); 
 }
 }  // namespace tap::communication::serial

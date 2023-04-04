@@ -117,14 +117,6 @@ static void initializeIo(src::Drivers *drivers)
     drivers->schedulerTerminalHandler.init();
     drivers->djiMotorTerminalSerialHandler.init();
 
-    tap::gpio::Leds::set(tap::gpio::Leds::LedPins::A, true);
-    tap::gpio::Leds::set(tap::gpio::Leds::LedPins::B, true);
-    tap::gpio::Leds::set(tap::gpio::Leds::LedPins::C, true);
-    tap::gpio::Leds::set(tap::gpio::Leds::LedPins::D, true);
-    tap::gpio::Leds::set(tap::gpio::Leds::LedPins::E, true);
-    tap::gpio::Leds::set(tap::gpio::Leds::LedPins::F, true);
-    tap::gpio::Leds::set(tap::gpio::Leds::LedPins::G, true);
-    tap::gpio::Leds::set(tap::gpio::Leds::LedPins::H, true);
 }
 
 static void updateIo(src::Drivers *drivers)

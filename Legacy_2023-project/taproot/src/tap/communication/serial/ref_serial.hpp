@@ -163,7 +163,7 @@ public:
 private:
     Rx::RobotData robotData;
     Rx::GameData gameData;
-    Rx::VTMControlData VTMData;
+    Rx::VTMControlData VTMControlData;
     modm::BoundedDeque<Rx::DamageEvent, DPS_TRACKER_DEQUE_SIZE> receivedDpsTracker;
     arch::MilliTimeout refSerialOfflineTimeout;
     std::unordered_map<uint16_t, RobotToRobotMessageHandler*> msgIdToRobotToRobotHandlerMap;
@@ -239,7 +239,8 @@ private:
     void updateReceivedDamage();
     void processReceivedDamage(uint32_t timestamp, int32_t damageTaken);
 
-    void handleVTMControl(const RecievedSerialMessage &message);
+    bool decodeVTMControl(const ReceivedSerialMessage& message);
+    bool getKey(Rx::Key k);
 };
 
 }  // namespace tap::communication::serial
