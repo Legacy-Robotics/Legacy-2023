@@ -112,7 +112,7 @@ public:
             uint16_t mouseWheel;
             uint8_t mouseL;
             uint8_t mouseR;
-            Key keys;
+            uint16_t keys;
         };
         
         /// The type of game the robot is competing in.

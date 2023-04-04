@@ -46,7 +46,7 @@ void initializeSubsystems()
 // Set Default Command with subsystem.setDefaultCommand(&command)
 void setDefaultCommands(src::Drivers* drivers)
 {
-    drive_train.setDefaultCommand(&omni_drive);
+    //drive_train.setDefaultCommand(&omni_drive);
 }
 
 // Set Commands scheduled on startup

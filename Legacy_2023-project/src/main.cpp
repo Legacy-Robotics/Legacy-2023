@@ -48,7 +48,6 @@
 
 /* define timers here -------------------------------------------------------*/
 tap::arch::PeriodicMilliTimer sendMotorTimeout(2);
-
 // Place any sort of input/output initialization here. For example, place
 // serial init stuff here.
 static void initializeIo(src::Drivers *drivers);
@@ -70,11 +69,19 @@ int main()
      *      IO states and run the scheduler.
      */
     src::Drivers *drivers = src::DoNotUse_getDrivers();
-    src::Control::initializeSubsystemCommands(drivers);
+    //src::Control::initializeSubsystemCommands(drivers);
 
     Board::initialize();
     initializeIo(drivers);
 
+    drivers->leds.set(tap::gpio::Leds::A, true);
+    drivers->leds.set(tap::gpio::Leds::B, true);
+    drivers->leds.set(tap::gpio::Leds::C, true);
+    drivers->leds.set(tap::gpio::Leds::D, true);
+    drivers->leds.set(tap::gpio::Leds::E, true);
+    drivers->leds.set(tap::gpio::Leds::F, true);
+    drivers->leds.set(tap::gpio::Leds::G, true);
+    drivers->leds.set(tap::gpio::Leds::H, true);
 
 #ifdef PLATFORM_HOSTED
     tap::motorsim::SimHandler::resetMotorSims();
@@ -88,6 +95,14 @@ int main()
     {
         // do this as fast as you can
         PROFILE(drivers->profiler, updateIo, (drivers));
+        if (drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::W)) drivers->leds.set(tap::gpio::Leds::A, false);
+        else drivers->leds.set(tap::gpio::Leds::A, true);
+        if (drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::A)) drivers->leds.set(tap::gpio::Leds::B, false);
+        else drivers->leds.set(tap::gpio::Leds::B, true);
+        if (drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::S)) drivers->leds.set(tap::gpio::Leds::C, false);
+        else drivers->leds.set(tap::gpio::Leds::C, true);
+        if (drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::D)) drivers->leds.set(tap::gpio::Leds::D, false);
+        else drivers->leds.set(tap::gpio::Leds::D, true);
 
         if (sendMotorTimeout.execute())
         {

@@ -35,7 +35,7 @@ using namespace tap::arch;
 namespace tap::communication::serial
 {
 RefSerial::RefSerial(Drivers* drivers)
-    : DJISerial(drivers, bound_ports::REF_SERIAL_UART_PORT),
+    : DJISerial(drivers, bound_ports::REF_SERIAL_UART_PORT, false),
       robotData(),
       gameData(),
       VTMControlData(),
@@ -438,6 +438,7 @@ bool RefSerial::operatorBlinded() const
 
 bool RefSerial::decodeVTMControl(const ReceivedSerialMessage& message)
 {
+    drivers->leds.set(tap::gpio::Leds::E, false);
     if (message.header.dataLength != 12)
     {
         return false;
@@ -451,6 +452,6 @@ bool RefSerial::decodeVTMControl(const ReceivedSerialMessage& message)
     return true;
 }
 bool RefSerial::getKey(Rx::Key k) {
-    return static_cast<uint16_t>(k) & static_cast<uint16_t>(VTMControlData.keys); 
+    return static_cast<uint16_t>(k) & VTMControlData.keys; 
 }
 }  // namespace tap::communication::serial

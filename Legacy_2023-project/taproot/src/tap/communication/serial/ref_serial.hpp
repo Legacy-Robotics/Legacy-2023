@@ -159,6 +159,7 @@ public:
      * referee system is offline.
      */
     bool operatorBlinded() const;
+    bool getKey(Rx::Key k);
 
 private:
     Rx::RobotData robotData;
@@ -240,7 +241,6 @@ private:
     void processReceivedDamage(uint32_t timestamp, int32_t damageTaken);
 
     bool decodeVTMControl(const ReceivedSerialMessage& message);
-    bool getKey(Rx::Key k);
 };
 
 }  // namespace tap::communication::serial
