@@ -26,7 +26,7 @@
 #endif
 
 #include "tap/board/board.hpp"
-
+#include "robot_control.hpp"
 #include "modm/architecture/interface/delay.hpp"
 
 #include "tap/algorithms/smooth_pid.hpp"
@@ -44,7 +44,6 @@
 
 /* control includes ---------------------------------------------------------*/
 #include "tap/architecture/clock.hpp"
-#include "Control/StandardControl.hpp"
 
 /* define timers here -------------------------------------------------------*/
 tap::arch::PeriodicMilliTimer sendMotorTimeout(2);
@@ -69,7 +68,8 @@ int main()
      *      IO states and run the scheduler.
      */
     src::Drivers *drivers = src::DoNotUse_getDrivers();
-    //src::Control::initializeSubsystemCommands(drivers);
+    src::Control::initializeSubsystemCommands(drivers);
+
 
     Board::initialize();
     initializeIo(drivers);
@@ -95,15 +95,6 @@ int main()
     {
         // do this as fast as you can
         PROFILE(drivers->profiler, updateIo, (drivers));
-        if (drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::W)) drivers->leds.set(tap::gpio::Leds::A, false);
-        else drivers->leds.set(tap::gpio::Leds::A, true);
-        if (drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::A)) drivers->leds.set(tap::gpio::Leds::B, false);
-        else drivers->leds.set(tap::gpio::Leds::B, true);
-        if (drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::S)) drivers->leds.set(tap::gpio::Leds::C, false);
-        else drivers->leds.set(tap::gpio::Leds::C, true);
-        if (drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::D)) drivers->leds.set(tap::gpio::Leds::D, false);
-        else drivers->leds.set(tap::gpio::Leds::D, true);
-
         if (sendMotorTimeout.execute())
         {
             PROFILE(drivers->profiler, drivers->mpu6500.periodicIMUUpdate, ());

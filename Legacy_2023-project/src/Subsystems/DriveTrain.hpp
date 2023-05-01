@@ -1,42 +1,45 @@
 #pragma once
+
 #include "tap/control/subsystem.hpp"
 #include "tap/motor/dji_motor.hpp"
 #include "tap/communication/serial/remote.hpp"
 
-namespace src::DriveTrain{
+namespace src::Drivetrain
+{
 
-    class DriveTrainSubsystem : public tap::control::Subsystem{
-        private:
-            //hardware constants
-            static constexpr tap::motor::MotorId RIGHT_FRONT_MOTOR_ID = tap::motor::MOTOR1;
-            static constexpr tap::motor::MotorId LEFT_FRONT_MOTOR_ID = tap::motor::MOTOR2;
-            static constexpr tap::motor::MotorId LEFT_BACK_MOTOR_ID = tap::motor::MOTOR3;
-            static constexpr tap::motor::MotorId RIGHT_BACK_MOTOR_ID = tap::motor::MOTOR4;
-            static constexpr tap::can::CanBus MOTOR_CAN_BUS = tap::can::CanBus::CAN_BUS1;
+class DrivetrainSubsystem : public tap::control::Subsystem
+{
+    public:
 
-            //software objects
-            tap::motor::DjiMotor rightFrontMotor;
-            tap::motor::DjiMotor leftFrontMotor;
-            tap::motor::DjiMotor leftBackMotor;
-            tap::motor::DjiMotor rightBackMotor;
+        static constexpr float MAX_CURRENT_OUTPUT = 10000.0f;
+        DrivetrainSubsystem(tap::Drivers* drivers) :
+            tap::control::Subsystem(drivers),
+            rightFrontMotor(drivers, RIGHT_FRONT_MOTOR_ID, MOTOR_CAN_BUS, true, "Front Right Wheel"),
+            leftFrontMotor(drivers, LEFT_FRONT_MOTOR_ID, MOTOR_CAN_BUS, false, "Front Left Wheel"),
+            leftBackMotor(drivers, LEFT_BACK_MOTOR_ID, MOTOR_CAN_BUS, false, "Back Left Wheel"),
+            rightBackMotor(drivers, RIGHT_BACK_MOTOR_ID, MOTOR_CAN_BUS, true, "Back Right Wheel")
+        {}
 
-        public:
+        void initialize() override;
 
-            static constexpr float MAX_CURRENT_OUTPUT = 10000.0f;
-            DriveTrainSubsystem(tap::Drivers *drivers) :
-                tap::control::Subsystem(drivers),
-                rightFrontMotor(drivers, RIGHT_FRONT_MOTOR_ID, MOTOR_CAN_BUS, true, "Front Right Wheel"),
-                leftFrontMotor(drivers, LEFT_FRONT_MOTOR_ID, MOTOR_CAN_BUS, false, "Front Left Wheel"),
-                leftBackMotor(drivers, LEFT_BACK_MOTOR_ID, MOTOR_CAN_BUS, false, "Back Left Wheel"),
-                rightBackMotor(drivers, RIGHT_BACK_MOTOR_ID, MOTOR_CAN_BUS, true, "Back Right Wheel")
-            {}
+        void refresh() override;
 
-            void initialize() override;
+        //custom functions
+        void setDesiredOutput(float x, float y, float z);
 
-            void refresh() override;
+    private:
+        //hardware constants
+        static constexpr tap::motor::MotorId RIGHT_FRONT_MOTOR_ID = tap::motor::MOTOR1;
+        static constexpr tap::motor::MotorId LEFT_FRONT_MOTOR_ID = tap::motor::MOTOR2;
+        static constexpr tap::motor::MotorId LEFT_BACK_MOTOR_ID = tap::motor::MOTOR3;
+        static constexpr tap::motor::MotorId RIGHT_BACK_MOTOR_ID = tap::motor::MOTOR4;
+        static constexpr tap::can::CanBus MOTOR_CAN_BUS = tap::can::CanBus::CAN_BUS1;
 
-            //custom functions
-            void setDesiredOutput(float x, float y, float z);
+        //software objects
+        tap::motor::DjiMotor rightFrontMotor;
+        tap::motor::DjiMotor leftFrontMotor;
+        tap::motor::DjiMotor leftBackMotor;
+        tap::motor::DjiMotor rightBackMotor;
+};
 
-    };
 }
