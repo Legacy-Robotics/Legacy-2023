@@ -460,6 +460,12 @@ bool RefSerial::decodeVTMControl(const ReceivedSerialMessage& message)
         VTMControlData.controlDisabled = !VTMControlData.controlDisabled;
     }
 
+    //update command scheduler key states
+    drivers->commandMapper.handleKeyStateChange(VTMControlData.keys,
+                                                tap::communication::serial::SwitchState::UNKNOWN, 
+                                                tap::communication::serial::SwitchState::UNKNOWN,
+                                                VTMControlData.mouseL, VTMControlData.mouseR);
+
     drivers->leds.set(tap::gpio::Leds::E, true);
     return true;
 }
@@ -479,5 +485,7 @@ void RefSerial::resetKeys() {
     VTMControlData.keys = 0;
     VTMControlData.disableKeyPressed = false;
     VTMControlData.controlDisabled = true;
+    drivers->commandMapper
+        .handleKeyStateChange(0, SwitchState::UNKNOWN, SwitchState::UNKNOWN, false, false);
 }
 }  // namespace tap::communication::serial
