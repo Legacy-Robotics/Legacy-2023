@@ -113,6 +113,8 @@ public:
             uint8_t mouseL;
             uint8_t mouseR;
             uint16_t keys;
+            bool controlDisabled;
+            bool disableKeyPressed;
         };
         
         /// The type of game the robot is competing in.

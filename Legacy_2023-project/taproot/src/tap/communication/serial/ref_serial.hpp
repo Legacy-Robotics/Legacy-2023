@@ -160,6 +160,8 @@ public:
      */
     bool operatorBlinded() const;
     bool getKey(Rx::Key k);
+    bool controlIsDisabled();
+    void resetKeys();
 
 private:
     Rx::RobotData robotData;

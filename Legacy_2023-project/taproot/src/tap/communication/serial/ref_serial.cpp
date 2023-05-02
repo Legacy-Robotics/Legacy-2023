@@ -436,22 +436,48 @@ bool RefSerial::operatorBlinded() const
            (arch::clock::getTimeMilliseconds() - lastReceivedWarningRobotTime <= blindTime);
 }
 
+//decode ref serial messages containing keyboard control data
 bool RefSerial::decodeVTMControl(const ReceivedSerialMessage& message)
 {
     drivers->leds.set(tap::gpio::Leds::E, false);
-    if (message.header.dataLength != 12)
-    {
-        return false;
-    }
+
+    //parse incoming serial data
+    if (message.header.dataLength != 12) return false;
+
     convertFromLittleEndian(&VTMControlData.mouseX, message.data);
     convertFromLittleEndian(&VTMControlData.mouseY, message.data + 2);
     convertFromLittleEndian(&VTMControlData.mouseWheel, message.data + 4);
     VTMControlData.mouseL = message.data[6];
     VTMControlData.mouseR = message.data[7];
     convertFromLittleEndian(&VTMControlData.keys, message.data + 8);
+
+    //ensure that disabled state is only toggled on keyup, so it isn't continually changed while holding
+    if (getKey(Rx::Key::X) && !VTMControlData.disableKeyPressed) {
+        VTMControlData.disableKeyPressed = true;
+    }
+    if (!getKey(Rx::Key::X) && VTMControlData.disableKeyPressed) {
+        VTMControlData.disableKeyPressed = false;
+        VTMControlData.controlDisabled = !VTMControlData.controlDisabled;
+    }
+
+    drivers->leds.set(tap::gpio::Leds::E, true);
     return true;
 }
+
+//return true if the key (k) is currently pressed
 bool RefSerial::getKey(Rx::Key k) {
     return static_cast<uint16_t>(k) & VTMControlData.keys; 
+}
+
+//return true if robot control is disabled
+bool RefSerial::controlIsDisabled() {
+    return VTMControlData.controlDisabled;
+}
+
+//clears keyboard state and disables the robot
+void RefSerial::resetKeys() {
+    VTMControlData.keys = 0;
+    VTMControlData.disableKeyPressed = false;
+    VTMControlData.controlDisabled = true;
 }
 }  // namespace tap::communication::serial
