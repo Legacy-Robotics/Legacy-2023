@@ -1,5 +1,4 @@
 #include "drivetrain_drive_command.hpp"
-#
 
 namespace src::Drivetrain
 {
@@ -13,15 +12,18 @@ drivers(drivers), dt(dt)
 void OmniDriveCommand::initialize()
 {
     aSet = false;
+    drivers->refSerial.resetKeys();
 }
 
 void OmniDriveCommand::execute()
 {
     aSet = true;
-    float_t y = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::W) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::S);
-    float_t x = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::A) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::D);
-    float_t rot = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::Q) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::E);
-    
+    float_t x = 0, y = 0 , rot = 0;
+    if (!drivers->refSerial.controlIsDisabled()) {
+        y = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::W) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::S);
+        x = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::A) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::D);
+        rot = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::Q) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::E);
+    }
     dt->setDesiredOutput(x, y, rot);
 }
 
