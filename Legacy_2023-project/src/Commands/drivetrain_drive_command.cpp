@@ -20,9 +20,14 @@ void OmniDriveCommand::execute()
     aSet = true;
     float_t x = 0, y = 0 , rot = 0;
     if (!drivers->refSerial.controlIsDisabled()) {
-        y = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::W) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::S);
-        x = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::A) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::D);
-        rot = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::Q) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::E);
+        x = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::A)
+            - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::D);
+        
+        y = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::W)
+            - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::S);
+        
+        rot = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::Q) 
+            - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::E);
     }
     dt->setDesiredOutput(x, y, rot);
 }
