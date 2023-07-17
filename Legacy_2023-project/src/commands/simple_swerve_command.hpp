@@ -2,16 +2,16 @@
 #define DRIVETRAIN_DRIVE_COMMAND
 
 #include "tap/control/command.hpp"
-#include "../Subsystems/drivetrain.hpp"
+#include "../subsystems/chassis.hpp"
 #include "drivers.hpp"
 
-namespace src::Drivetrain
+namespace src::chassis
 {
-class OmniDriveCommand : public tap::control::Command
+class SimpleSwerveCommand : public tap::control::Command
 {
     public:
 
-        OmniDriveCommand(src::Drivers* drivers, DrivetrainSubsystem* dt);
+        SimpleSwerveCommand(src::Drivers* drivers, ChassisSubsystem* chassis);
 
         void initialize() override;
 
@@ -27,9 +27,9 @@ class OmniDriveCommand : public tap::control::Command
 
     private:
 
-        DrivetrainSubsystem* dt;
+        ChassisSubsystem* chassis;
         src::Drivers* drivers;
-        bool aSet;
+        bool safety;
 };
 }
 

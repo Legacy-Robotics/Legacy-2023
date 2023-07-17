@@ -10,9 +10,9 @@
 #include "tap/control/setpoint/commands/calibrate_command.hpp"
 #include "tap/control/toggle_command_mapping.hpp"
 //include subsystems below
-#include "../Subsystems/drivetrain.hpp"
+#include "../subsystems/chassis.hpp"
 //include commands below
-#include "../Commands/drivetrain_drive_command.hpp"
+#include "../commands/simple_swerve_command.hpp"
 
 /*
  * NOTE: We are using the DoNotUse_getDrivers() function here
@@ -26,14 +26,14 @@ using namespace tap;
 using namespace tap::control;
 
 //include subsystem namespaces below
-using namespace src::Drivetrain;
+using namespace src::chassis;
 
 namespace StandardControl {
 
 // Define Subsystems Here
-DrivetrainSubsystem drivetrain(drivers());
+ChassisSubsystem drivetrain(drivers());
 // Define Commands Here
-OmniDriveCommand omni(drivers(), &drivetrain);
+SimpleSwerveCommand omni(drivers(), &drivetrain);
 
 // Define Command Mappings Here
 // Register Subsystems with drivers->commandScheduler.registerSubsystem(&subsystem_name);

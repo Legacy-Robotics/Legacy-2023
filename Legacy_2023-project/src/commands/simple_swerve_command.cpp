@@ -1,44 +1,44 @@
-#include "drivetrain_drive_command.hpp"
+#include "simple_swerve_command.hpp"
 
-namespace src::Drivetrain
+namespace src::chassis
 {
 
-OmniDriveCommand::OmniDriveCommand(src::Drivers* drivers, DrivetrainSubsystem* dt) : 
-drivers(drivers), dt(dt)
+SimpleSwerveCommand::SimpleSwerveCommand(src::Drivers* drivers, ChassisSubsystem* chassis) : 
+drivers(drivers), chassis(chassis)
 {
-    addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(dt));
+    addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(chassis));
 }
 
-void OmniDriveCommand::initialize()
+void SimpleSwerveCommand::initialize()
 {
-    aSet = false;
+    safety = false;
     drivers->refSerial.resetKeys();
 }
 
-void OmniDriveCommand::execute()
+void SimpleSwerveCommand::execute()
 {
-    aSet = true;
+    safety = true;
     float_t x = 0, y = 0 , rot = 0;
     if (!drivers->refSerial.controlIsDisabled()) {
         y = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::W) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::S);
         x = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::A) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::D);
         rot = drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::Q) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::E);
     }
-    dt->setDesiredOutput(x, y, rot);
+    chassis->setDesiredOutput(x, y, rot);
 }
 
-void OmniDriveCommand::end(bool)
+void SimpleSwerveCommand::end(bool)
 {
-    dt->setDesiredOutput(0, 0, 0);
-    aSet = false;
+    chassis->setDesiredOutput(0, 0, 0);
+    safety = false;
 }
 
-bool OmniDriveCommand::isFinished() const
+bool SimpleSwerveCommand::isFinished() const
 {
     return false;
 }
 
-bool OmniDriveCommand::isReady()
+bool SimpleSwerveCommand::isReady()
 {
     return true;
 }
