@@ -1,16 +1,15 @@
 #pragma once
-
 #include "tap/control/command.hpp"
-#include "../subsystems/chassis.hpp"
+#include "../subsystems/turret.hpp"
 #include "drivers.hpp"
 
-namespace src::chassis
+namespace src::turret
 {
-class SimpleSwerveCommand : public tap::control::Command
+class SimpleTurretCommand : public tap::control::Command
 {
     public:
 
-        SimpleSwerveCommand(src::Drivers* drivers, ChassisSubsystem* chassis);
+        SimpleTurretCommand(src::Drivers* drivers, TurretSubsystem* turret);
 
         void initialize() override;
 
@@ -26,7 +25,7 @@ class SimpleSwerveCommand : public tap::control::Command
 
     private:
 
-        ChassisSubsystem* chassis;
+        TurretSubsystem* turret;
         src::Drivers* drivers;
         bool safety;
 };
