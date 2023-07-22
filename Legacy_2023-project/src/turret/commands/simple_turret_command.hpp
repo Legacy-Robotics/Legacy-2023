@@ -27,6 +27,5 @@ class SimpleTurretCommand : public tap::control::Command
 
         TurretSubsystem* turret;
         src::Drivers* drivers;
-        bool safety;
 };
 }

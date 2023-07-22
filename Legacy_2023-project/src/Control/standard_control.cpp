@@ -10,9 +10,9 @@
 #include "tap/control/setpoint/commands/calibrate_command.hpp"
 #include "tap/control/toggle_command_mapping.hpp"
 //include subsystems below
-#include "../subsystems/chassis.hpp"
+#include "../chassis/subsystems/chassis.hpp"
 //include commands below
-#include "../commands/simple_swerve_command.hpp"
+#include "../chassis/commands/simple_swerve_command.hpp"
 
 /*
  * NOTE: We are using the DoNotUse_getDrivers() function here
@@ -27,19 +27,23 @@ using namespace tap::control;
 
 //include subsystem namespaces below
 using namespace src::chassis;
+using namespace src::turret;
 
 namespace StandardControl {
 
 // Define Subsystems Here
-ChassisSubsystem drivetrain(drivers());
+ChassisSubsystem chassis(drivers());
+TurretSubsystem turret(drivers());
+
 // Define Commands Here
-SimpleSwerveCommand omni(drivers(), &drivetrain);
+SimpleSwerveCommand swerve(drivers(), &chassis);
+SimpleTurretCommand turretControl(drivers(), &turret);
 
 // Define Command Mappings Here
 // Register Subsystems with drivers->commandScheduler.registerSubsystem(&subsystem_name);
 void registerSubsystems(src::Drivers* drivers)
 {
-    drivers->commandScheduler.registerSubsystem(&drivetrain);
+    drivers->commandScheduler.registerSubsystem(&chassis);
 }
 
 // Initialize Subsystems with subsystem.initialize();
@@ -51,7 +55,7 @@ void initializeSubsystems()
 // Set Default Command with subsystem.setDefaultCommand(&command)
 void setDefaultCommands(src::Drivers* drivers)
 {
-    drivetrain.setDefaultCommand(&omni);
+    drivetrain.setDefaultCommand(&swerve);
 }
 
 // Set Commands scheduled on startup
