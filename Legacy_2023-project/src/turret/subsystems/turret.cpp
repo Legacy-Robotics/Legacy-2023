@@ -5,39 +5,24 @@ namespace src::turret
 
 void TurretSubsystem::initialize()
 {
-    //set pid constants determined by tuning
-    pitchPIDConfig.kp = 1.0;
-    pitchPIDConfig.ki = 0.0;
-    pitchPIDConfig.kd = 0.0;
-
-    yawPIDConfig.kp = 1.0;
-    yawPIDConfig.ki = 0.0;
-    yawPIDConfig.kd = 0.0;
-
-    //initialize PID controllers
-    pitchPID = tap::algoritihims::SmoothPid(pitchPIDConfig);
-    yawPID = tap::algoritihims::SmoothPid(yawPIDConfig);
-    lastPIDUpdate = tap::arch::getTimeMilliseconds();
-
+    lastPIDUpdate = tap::arch::clock::getTimeMilliseconds();
     pitchMotor.initialize();
     yawMotor.initialize();
-    idxMotor.initialize();
-    rightFireMotor.initialize();
-    leftFireMotor.initialize();
 }
 
 void TurretSubsystem::refresh()
 {
+    //TODO: motor should be calibrated and on angle before running PID
     enabled = drivers->refSerial.controlIsDisabled();
     if (enabled && calibrated)
     {
-        uint32_t timeNow = tap::arch::getTimeMilliseconds(), dt = timeNow - lastPIDUpdate;
+        uint32_t timeNow = tap::arch::clock::getTimeMilliseconds(), dt = timeNow - lastPIDUpdate;
 
         //get the actual encoder value, and give the PID controllers the error
         pitchPosition = pitchMotor.getEncoderWrapped();
         yawPosition = pitchMotor.getEncoderWrapped();
-        pitchPID.runControllerDerivativeError(pitchDesired - pitchPosition, dt);
-        pitchPID.runControllerDerivativeError(yawDesired - yawPosition, dt);
+        pitchPID.runControllerDerivateError(pitchDesired - pitchPosition, dt);
+        pitchPID.runControllerDerivateError(yawDesired - yawPosition, dt);
 
         //take the output calculated by the PID controller and command it to the motors
         pitchMotor.setDesiredOutput(pitchPID.getOutput());

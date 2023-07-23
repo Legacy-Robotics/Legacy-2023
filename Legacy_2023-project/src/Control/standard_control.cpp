@@ -11,8 +11,10 @@
 #include "tap/control/toggle_command_mapping.hpp"
 //include subsystems below
 #include "../chassis/subsystems/chassis.hpp"
+#include "../turret/subsystems/turret.hpp"
 //include commands below
 #include "../chassis/commands/simple_swerve_command.hpp"
+#include "../turret/commands/simple_turret_command.hpp"
 
 /*
  * NOTE: We are using the DoNotUse_getDrivers() function here
@@ -49,13 +51,15 @@ void registerSubsystems(src::Drivers* drivers)
 // Initialize Subsystems with subsystem.initialize();
 void initializeSubsystems()
 {
-    drivetrain.initialize();
+    chassis.initialize();
+    turret.initialize();
 }
 
 // Set Default Command with subsystem.setDefaultCommand(&command)
 void setDefaultCommands(src::Drivers* drivers)
 {
-    drivetrain.setDefaultCommand(&swerve);
+    chassis.setDefaultCommand(&swerve);
+    turret.setDefaultCommand(&turretControl);
 }
 
 // Set Commands scheduled on startup

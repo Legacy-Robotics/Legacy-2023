@@ -11,19 +11,20 @@ drivers(drivers), turret(turret)
 
 void SimpleTurretCommand::initialize()
 {
-    safety = true;
-    drivers->refSerial.resetKeys();
 }
 
 void SimpleTurretCommand::execute()
 {
-    if (!drivers->refSerial.controlIsDisabled()) {
-    }
+    float_t pitch = turret->getPitch(), yaw = turret->getYaw();
+    pitch += drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::V) \
+            - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::C);
+    yaw += drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::R) \
+            - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::F);
+    turret->setDesiredOutput(pitch, yaw);
 }
 
 void SimpleTurretCommand::end(bool)
 {
-    safety = true;
 }
 
 bool SimpleTurretCommand::isFinished() const
