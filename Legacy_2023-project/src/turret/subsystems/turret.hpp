@@ -21,14 +21,23 @@ class TurretSubsystem : public tap::control::Subsystem
             pitchPosition(0), yawPosition(0), pitchDesired(0), yawDesired(0), lastPIDUpdate(0),
             enabled(false), calibrated(false)
         {
+            //PID controller outputs float, could it be an issue?
+            pitchPID.setMaxOutput(2 * GM6020_MAX_OUTPUT);
+            yawPID.setMaxOutput(2 * GM6020_MAX_OUTPUT);
 
+            //TODO: set integral runoff limits when tuning
+            //pitchPID.setMaxICumulative();
+            //yawPID.setMaxICumulative();
         }
 
-        static constexpr float MAX_CURRENT_OUTPUT = 10000.0f;
+        //units of encoder ticks, 8192 max
         static constexpr uint16_t MIN_ANGLE_PITCH_ENC = 0;              //0 degrees
         static constexpr uint16_t MAX_ANGLE_PITCH_ENC = 8192;           //360 degrees
         static constexpr uint16_t MIN_ANGLE_YAW_ENC = 1365;             //60 degrees
         static constexpr uint16_t MAX_ANGLE_YAW_ENC = 3640;             //160 degrees
+
+        //TODO: put this in a motor constants file
+        static constexpr uint16_t GM6020_MAX_OUTPUT = 30000;
 
         void initialize() override;
 

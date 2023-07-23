@@ -25,8 +25,9 @@ void TurretSubsystem::refresh()
         pitchPID.runControllerDerivateError(yawDesired - yawPosition, dt);
 
         //take the output calculated by the PID controller and command it to the motors
-        pitchMotor.setDesiredOutput(pitchPID.getOutput());
-        yawMotor.setDesiredOutput(yawPID.getOutput());
+        //subtract GM6020_MAX_OUTPUT to create "negative" output from PID
+        pitchMotor.setDesiredOutput(pitchPID.getOutput() - GM6020_MAX_OUTPUT);
+        yawMotor.setDesiredOutput(yawPID.getOutput() - GM6020_MAX_OUTPUT);
     }
 }
 
