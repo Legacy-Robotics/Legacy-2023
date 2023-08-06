@@ -73,12 +73,12 @@ void DjiMotorTxHandler::encodeAndSendCanData()
         0,
         false);
     modm::can::Message can2MessageLow(
-        CAN_DJI_LOW_IDENTIFIER,
+        CAN_DJI_LOW_IDENTIFIER_GM6020,
         CAN_DJI_MESSAGE_SEND_LENGTH,
         0,
         false);
     modm::can::Message can2MessageHigh(
-        CAN_DJI_HIGH_IDENTIFIER,
+        CAN_DJI_HIGH_IDENTIFIER_GM6020,
         CAN_DJI_MESSAGE_SEND_LENGTH,
         0,
         false);
@@ -145,8 +145,8 @@ void DjiMotorTxHandler::serializeMotorStoreSendData(
         const DjiMotor* const motor = canMotorStore[i];
         if (motor != nullptr)
         {
-            if (DJI_MOTOR_TO_NORMALIZED_ID(motor->getMotorIdentifier()) <=
-                DJI_MOTOR_TO_NORMALIZED_ID(tap::motor::MOTOR4))
+            if ((motor->canBus == tap::can::CanBus::CAN_BUS1 && DJI_MOTOR_TO_NORMALIZED_ID(motor->getMotorIdentifier()) <=
+                DJI_MOTOR_TO_NORMALIZED_ID(tap::motor::MOTOR4)) || motor->canBus == tap::can::CanBus::CAN_BUS2)
             {
                 motor->serializeCanSendData(messageLow);
                 *validMotorMessageLow = true;

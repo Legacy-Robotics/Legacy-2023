@@ -16,8 +16,8 @@ void SimpleTurretCommand::initialize()
 void SimpleTurretCommand::execute()
 {
     float_t pitch = turret->getPitch(), yaw = turret->getYaw();
-    pitch = 20000 * (drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::V) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::C));
-    yaw = 20000 * (drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::R) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::F));
+    pitch = 5000 * (drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::R) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::F));
+    yaw = 5000 * (drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::V) - drivers->refSerial.getKey(tap::communication::serial::RefSerialData::Rx::Key::C));
     turret->setDesiredOutput(pitch, yaw);
 }
 

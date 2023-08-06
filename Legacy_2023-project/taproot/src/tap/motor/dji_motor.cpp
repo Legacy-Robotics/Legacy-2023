@@ -112,7 +112,15 @@ bool DjiMotor::isMotorOnline() const
 
 void DjiMotor::serializeCanSendData(modm::can::Message* txMessage) const
 {
-    int id = DJI_MOTOR_TO_NORMALIZED_ID(this->getMotorIdentifier());  // number between 0 and 7
+    int id;
+    if (motorCanBus == tap::can::CanBus::CAN_BUS1)
+    {
+        id = DJI_MOTOR_TO_NORMALIZED_ID(this->getMotorIdentifier());  // number between 0 and 7
+    }
+    else 
+    {
+        id = DJI_MOTOR_TO_NORMALIZED_ID(this->getMotorIdentifier() - 4);  // number between 0 and 7
+    }
     // this method assumes you have choosen the correct message
     // to send the data in. Is blind to message type and is a private method
     // that I use accordingly.

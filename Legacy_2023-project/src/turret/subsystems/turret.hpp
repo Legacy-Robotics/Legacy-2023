@@ -51,9 +51,9 @@ class TurretSubsystem : public tap::control::Subsystem
 
     private:
         //hardware constants
-        static constexpr tap::motor::MotorId PITCH_MOTOR_ID = tap::motor::MOTOR7;
-        static constexpr tap::motor::MotorId YAW_MOTOR_ID = tap::motor::MOTOR8;
-        static constexpr tap::can::CanBus MOTOR_CAN_BUS = tap::can::CanBus::CAN_BUS1;
+        static constexpr tap::motor::MotorId PITCH_MOTOR_ID = tap::motor::MOTOR5;
+        static constexpr tap::motor::MotorId YAW_MOTOR_ID = tap::motor::MOTOR6;
+        static constexpr tap::can::CanBus MOTOR_CAN_BUS = tap::can::CanBus::CAN_BUS2;
 
         //software objects
         tap::motor::DjiMotor pitchMotor;
