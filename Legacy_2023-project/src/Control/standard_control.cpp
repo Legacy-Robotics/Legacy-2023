@@ -46,6 +46,7 @@ SimpleTurretCommand turretControl(drivers(), &turret);
 void registerSubsystems(src::Drivers* drivers)
 {
     drivers->commandScheduler.registerSubsystem(&chassis);
+    drivers->commandScheduler.registerSubsystem(&turret);
 }
 
 // Initialize Subsystems with subsystem.initialize();

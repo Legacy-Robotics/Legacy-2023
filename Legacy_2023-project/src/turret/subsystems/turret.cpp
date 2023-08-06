@@ -43,13 +43,10 @@ void TurretSubsystem::refresh()
  */
 void TurretSubsystem::setDesiredOutput(float pitch, float yaw)
 {
-    //convert float degrees to angle here because called less frequently than refresh
-    uint16_t pitchTemp = (pitch / 360) * tap::motor::DjiMotor::ENC_RESOLUTION;
-    uint16_t yawTemp = (yaw / 360) * tap::motor::DjiMotor::ENC_RESOLUTION;
-
-    //clamp values to angle limits
-    pitchDesired = std::clamp<uint16_t>(pitchTemp, MIN_ANGLE_PITCH_ENC, MAX_ANGLE_PITCH_ENC);
-    yawDesired = std::clamp<uint16_t>(yawTemp, MIN_ANGLE_YAW_ENC, MAX_ANGLE_YAW_ENC);
+    this->pitchDesired = pitch;
+    this->yawDesired = yaw;
+    pitchMotor.setDesiredOutput(pitch);
+    yawMotor.setDesiredOutput(yaw);
 }
 
 }
