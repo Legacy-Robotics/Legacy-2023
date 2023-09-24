@@ -1,6 +1,6 @@
-[submodule "taproot"]
-	path = taproot
-	url = https://gitlab.com/aruw/controls/taproot.git
+[submodule "Forgroot"]
+	path = Forgroot
+	url = https://github.com/Legacy-Robotics/Forgroot
 [submodule "taproot-scripts"]
 	path = taproot-scripts
 	url = https://gitlab.com/aruw/controls/taproot-scripts.git
