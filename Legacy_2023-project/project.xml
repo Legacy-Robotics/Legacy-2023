@@ -1,7 +1,7 @@
 <library>
   <repositories>
     <repository>
-      <path>../taproot/repo.lb</path>
+      <path>../Forgroot/repo.lb</path>
     </repository>
   </repositories>
   <options>
@@ -14,6 +14,7 @@
     <option name="taproot:dev_board">rm-dev-board-a</option>
     <option name="taproot:communication:serial:terminal_serial:uart_port">Uart3</option>
     <option name="taproot:communication:serial:ref_serial:uart_port">Uart6</option>
+    <option name="taproot:communication:serial:vtm:uart_port">Uart8</option>
     <option name="taproot:board:digital_in_pins">A,B,C,D</option>
     <option name="taproot:board:digital_out_pins">E,F,G,H,Laser</option>
     <option name="taproot:board:analog_in_pins">S,T,U,V,OledJoystick</option>
