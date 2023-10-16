@@ -135,7 +135,6 @@ void DJISerial::updateSerial()
         }
         case PROCESS_FRAME_DATA:  // READ bulk of message
         {
-            drivers->leds.set(tap::gpio::Leds::F, false);
             int bytesToRead = sizeof(newMessage.messageType) + newMessage.header.dataLength;
             if (rxCrcEnabled)
             {

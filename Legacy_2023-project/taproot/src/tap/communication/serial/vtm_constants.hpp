@@ -21,47 +21,14 @@
  * along with Taproot.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TAPROOT_CAN_SERIALIZER_HPP_
-#define TAPROOT_CAN_SERIALIZER_HPP_
+#ifndef TAPROOT_VTM_SERIAL_CONSTANTS_HPP_
+#define TAPROOT_VTM_SERIAL_CONSTANTS_HPP_
 
-#ifdef PLATFORM_HOSTED
+#include "uart.hpp"
 
-#include <array>
-#include <cstdint>
-
-#include "tap/motor/dji_motor.hpp"
-
-namespace modm::can
+namespace tap::communication::serial::bound_ports
 {
-class Message;
-}
+    static constexpr Uart::UartPort VTM_UART_PORT = Uart::UartPort::Uart8;
+}  // namespace tap::communication::serial::bound_ports
 
-namespace tap::motor::motorsim
-{
-class CanSerializer
-{
-public:
-    /**
-     * Parse a given CAN motor message into 4 motor input values.
-     * Returns a 16-bit int array containing the 4 integer input values.
-     */
-    static std::array<int16_t, 4> parseMessage(const modm::can::Message* message);
-
-    /**
-     * Serialize the given motor feedback data into a CAN Message.
-     */
-    static modm::can::Message serializeFeedback(
-        int16_t angle,
-        int16_t rpm,
-        int16_t current,
-        MotorId mid);
-
-private:
-    /* Constants */
-    static constexpr uint8_t FEEDBACK_MESSAGE_SEND_LENGTH = 8;
-};
-}  // namespace tap::motor::motorsim
-
-#endif  // PLATFORM_HOSTED
-
-#endif  // TAPROOT_CAN_SERIALIZER_HPP_
+#endif  // TAPROOT_REF_SERIAL_CONSTANTS_HPP_

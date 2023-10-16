@@ -35,10 +35,9 @@ using namespace tap::arch;
 namespace tap::communication::serial
 {
 RefSerial::RefSerial(Drivers* drivers)
-    : DJISerial(drivers, bound_ports::REF_SERIAL_UART_PORT, false),
+    : DJISerial(drivers, bound_ports::REF_SERIAL_UART_PORT),
       robotData(),
       gameData(),
-      VTMControlData(),
       receivedDpsTracker(),
       transmissionSemaphore(1)
 {
@@ -57,11 +56,6 @@ void RefSerial::messageReceiveCallback(const ReceivedSerialMessage& completeMess
     updateReceivedDamage();
     switch (completeMessage.messageType)
     {
-        case REF_MESSAGE_TYPE_VTM_CONTROL:
-        {
-            decodeVTMControl(completeMessage);
-            break;
-        }
         case REF_MESSAGE_TYPE_GAME_STATUS:
         {
             decodeToGameStatus(completeMessage);
@@ -436,56 +430,4 @@ bool RefSerial::operatorBlinded() const
            (arch::clock::getTimeMilliseconds() - lastReceivedWarningRobotTime <= blindTime);
 }
 
-//decode ref serial messages containing keyboard control data
-bool RefSerial::decodeVTMControl(const ReceivedSerialMessage& message)
-{
-    drivers->leds.set(tap::gpio::Leds::E, false);
-
-    //parse incoming serial data
-    if (message.header.dataLength != 12) return false;
-
-    convertFromLittleEndian(&VTMControlData.mouseX, message.data);
-    convertFromLittleEndian(&VTMControlData.mouseY, message.data + 2);
-    convertFromLittleEndian(&VTMControlData.mouseWheel, message.data + 4);
-    VTMControlData.mouseL = message.data[6];
-    VTMControlData.mouseR = message.data[7];
-    convertFromLittleEndian(&VTMControlData.keys, message.data + 8);
-
-    //ensure that disabled state is only toggled on keyup, so it isn't continually changed while holding
-    if (getKey(Rx::Key::X) && !VTMControlData.disableKeyPressed) {
-        VTMControlData.disableKeyPressed = true;
-    }
-    if (!getKey(Rx::Key::X) && VTMControlData.disableKeyPressed) {
-        VTMControlData.disableKeyPressed = false;
-        VTMControlData.controlDisabled = !VTMControlData.controlDisabled;
-    }
-
-    //update command scheduler key states
-    drivers->commandMapper.handleKeyStateChange(VTMControlData.keys,
-                                                tap::communication::serial::Remote::SwitchState::UNKNOWN, 
-                                                tap::communication::serial::Remote::SwitchState::UNKNOWN,
-                                                VTMControlData.mouseL, VTMControlData.mouseR);
-
-    drivers->leds.set(tap::gpio::Leds::E, true);
-    return true;
-}
-
-//return true if the key (k) is currently pressed
-bool RefSerial::getKey(Rx::Key k) {
-    return static_cast<uint16_t>(k) & VTMControlData.keys; 
-}
-
-//return true if robot control is disabled
-bool RefSerial::controlIsDisabled() {
-    return VTMControlData.controlDisabled;
-}
-
-//clears keyboard state and disables the robot
-void RefSerial::resetKeys() {
-    VTMControlData.keys = 0;
-    VTMControlData.disableKeyPressed = false;
-    VTMControlData.controlDisabled = true;
-    drivers->commandMapper.handleKeyStateChange(0, tap::communication::serial::Remote::SwitchState::UNKNOWN,
-        tap::communication::serial::Remote::SwitchState::UNKNOWN, false, false);
-}
 }  // namespace tap::communication::serial

@@ -39,6 +39,7 @@
 #include "tap/mock/pwm_mock.hpp"
 #include "tap/mock/ref_serial_mock.hpp"
 #include "tap/mock/remote_mock.hpp"
+#include "tap/mock/remote_mock.hpp"
 #include "tap/mock/scheduler_terminal_handler_mock.hpp"
 #include "tap/mock/terminal_serial_mock.hpp"
 #include "tap/mock/uart_mock.hpp"
@@ -56,6 +57,7 @@
 #include "tap/communication/serial/remote.hpp"
 #include "tap/communication/serial/terminal_serial.hpp"
 #include "tap/communication/serial/uart.hpp"
+#include "tap/communication/serial/vtm.hpp"
 #include "tap/control/command_mapper.hpp"
 #include "tap/control/scheduler_terminal_handler.hpp"
 #include "tap/errors/error_controller.hpp"
@@ -85,6 +87,7 @@ protected:
           pwm(),
           mpu6500(this),
           refSerial(this),
+          vtm(this),
           remote(this),
           uart(),
           terminalSerial(this),
@@ -110,6 +113,7 @@ protected:
     testing::NiceMock<mock::PwmMock> pwm;
     testing::NiceMock<mock::Mpu6500Mock> mpu6500;
     testing::NiceMock<mock::RefSerialMock> refSerial;
+    testing::NiceMock<mock::RemoteMock> vtm;
     testing::NiceMock<mock::RemoteMock> remote;
     testing::NiceMock<mock::UartMock> uart;
     testing::NiceMock<mock::TerminalSerialMock> terminalSerial;
@@ -130,6 +134,7 @@ public:
     gpio::Pwm pwm;
     communication::sensors::imu::mpu6500::Mpu6500 mpu6500;
     communication::serial::RefSerial refSerial;
+    communication::serial::Vtm vtm;
     communication::serial::Remote remote;
     communication::serial::Uart uart;
     communication::serial::TerminalSerial terminalSerial;

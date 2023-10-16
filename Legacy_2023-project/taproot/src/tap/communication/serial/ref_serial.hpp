@@ -104,7 +104,6 @@ public:
         REF_MESSAGE_TYPE_CUSTOM_DATA = 0x301,
         // REF_MESSAGE_TYPE_CUSTOM_CONTROLLER = 0x302,
         // REF_MESSAGE_TYPE_SMALL_MAP = 0x303;
-        REF_MESSAGE_TYPE_VTM_CONTROL = 0x304,
     };
 
     /**
@@ -159,14 +158,19 @@ public:
      * referee system is offline.
      */
     bool operatorBlinded() const;
-    bool getKey(Rx::Key k);
-    bool controlIsDisabled();
-    void resetKeys();
+
+    /**
+     * @return True if the specified heat and heatLimit values are "valid". These values are valid
+     * if they aren't 0xffff and if the heatLimit is not 0.
+     */
+    static inline bool heatAndLimitValid(uint16_t heat, uint16_t heatLimit)
+    {
+        return heat != 0xffff && heatLimit != 0xffff && heatLimit != 0;
+    }
 
 private:
     Rx::RobotData robotData;
     Rx::GameData gameData;
-    Rx::VTMControlData VTMControlData;
     modm::BoundedDeque<Rx::DamageEvent, DPS_TRACKER_DEQUE_SIZE> receivedDpsTracker;
     arch::MilliTimeout refSerialOfflineTimeout;
     std::unordered_map<uint16_t, RobotToRobotMessageHandler*> msgIdToRobotToRobotHandlerMap;
@@ -241,8 +245,6 @@ private:
 
     void updateReceivedDamage();
     void processReceivedDamage(uint32_t timestamp, int32_t damageTaken);
-
-    bool decodeVTMControl(const ReceivedSerialMessage& message);
 };
 
 }  // namespace tap::communication::serial

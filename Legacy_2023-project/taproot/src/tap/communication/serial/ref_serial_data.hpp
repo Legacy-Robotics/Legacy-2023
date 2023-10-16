@@ -86,37 +86,6 @@ public:
     class Rx
     {
     public:
-        enum class Key : uint16_t 
-        {
-            W = modm::Bit0,
-            S = modm::Bit1,
-            A = modm::Bit2,
-            D = modm::Bit3,
-            SHIFT = modm::Bit4,
-            CTRL = modm::Bit5,
-            Q = modm::Bit6,
-            E = modm::Bit7,
-            R = modm::Bit8,
-            F = modm::Bit9,
-            G = modm::Bit10,
-            Z = modm::Bit11,
-            X = modm::Bit12,
-            C = modm::Bit13,
-            V = modm::Bit14,
-            B = modm::Bit15
-        };
-
-        struct VTMControlData {
-            uint16_t mouseX;
-            uint16_t mouseY;
-            uint16_t mouseWheel;
-            uint8_t mouseL;
-            uint8_t mouseR;
-            uint16_t keys;
-            bool controlDisabled;
-            bool disableKeyPressed;
-        };
-        
         /// The type of game the robot is competing in.
         enum class GameType : uint8_t
         {
