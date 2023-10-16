@@ -119,10 +119,10 @@ static void initializeIo(src::Drivers *drivers)
     drivers->remote.initialize();
     drivers->mpu6500.init();
     drivers->refSerial.initialize();
+    drivers->vtm.initialize();
     drivers->terminalSerial.initialize();
     drivers->schedulerTerminalHandler.init();
     drivers->djiMotorTerminalSerialHandler.init();
-
 }
 
 static void updateIo(src::Drivers *drivers)
@@ -133,6 +133,7 @@ static void updateIo(src::Drivers *drivers)
 
     drivers->canRxHandler.pollCanData();
     drivers->refSerial.updateSerial();
+    drivers->vtm.updateSerial();
     drivers->remote.read();
     drivers->mpu6500.read();
 }
