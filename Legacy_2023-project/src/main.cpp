@@ -117,7 +117,7 @@ static void initializeIo(src::Drivers *drivers)
     drivers->can.initialize();
     drivers->errorController.init();
     drivers->remote.initialize();
-    drivers->mpu6500.init();
+    drivers->mpu6500.init(0,0,0);
     drivers->refSerial.initialize();
     drivers->vtm.initialize();
     drivers->terminalSerial.initialize();

@@ -11,19 +11,14 @@ drivers(drivers), turret(turret)
 
 void SimpleTurretCommand::initialize()
 {
-    safety = true;
-    drivers->refSerial.resetKeys();
 }
 
 void SimpleTurretCommand::execute()
 {
-    if (!drivers->refSerial.controlIsDisabled()) {
-    }
 }
 
 void SimpleTurretCommand::end(bool)
 {
-    safety = true;
 }
 
 bool SimpleTurretCommand::isFinished() const

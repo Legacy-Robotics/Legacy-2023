@@ -34,7 +34,7 @@ using namespace tap::arch;
 
 namespace tap::communication::serial
 {
-Vtm:Vtm(Drivers* drivers)
+Vtm::Vtm(Drivers* drivers)
     : DJISerial(drivers, bound_ports::VTM_UART_PORT, false),
       vtm(),
       transmissionSemaphore(1)
@@ -42,13 +42,13 @@ Vtm:Vtm(Drivers* drivers)
     VTMOfflineTimeout.stop();
 }
 
-bool Vtm:getVTMReceivingData() const
+bool Vtm::getVTMReceivingData() const
 {
     return !(VTMOfflineTimeout.isStopped() || VTMOfflineTimeout.isExpired());
 }
 
 //Todo: rename function
-void Vtm:messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
+void Vtm::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
 {
     VTMOfflineTimeout.restart(10000);
 
@@ -56,17 +56,17 @@ void Vtm:messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
 }
 
 //decode ref serial messages containing keyboard control data
-bool Vtm:decodeVTMControl(const ReceivedSerialMessage& message)
+bool Vtm::decodeVTMControl(const ReceivedSerialMessage& message)
 {
     //parse incoming serial data
     if (message.header.dataLength != 12) return false;
 
     convertFromLittleEndian(&vtm.mouse.x, message.data);
     convertFromLittleEndian(&vtm.mouse.y, message.data + 2);
-    convertFromLittleEndian(&vtm.mouse.wheel., message.data + 4);
-    VTMControlData.mouseL = message.data[6];
-    VTMControlData.mouseR = message.data[7];
-    convertFromLittleEndian(&VTMControlData.keys, message.data + 8);
+    convertFromLittleEndian(&vtm.mouse.wheel, message.data + 4);
+    vtm.mouse.l = message.data[6];
+    vtm.mouse.r = message.data[7];
+    convertFromLittleEndian(&vtm.key, message.data + 8);
 
     //ensure that disabled state is only toggled on keyup, so it isn't continually changed while holding
     //Todo: fix this
@@ -81,7 +81,7 @@ bool Vtm:decodeVTMControl(const ReceivedSerialMessage& message)
     */
 
     //update command scheduler key states
-    drivers->commandMapper.handleKeyStateChange(vtm.keys,
+    drivers->commandMapper.handleKeyStateChange(vtm.key,
                                                 tap::communication::serial::Remote::SwitchState::UNKNOWN, 
                                                 tap::communication::serial::Remote::SwitchState::UNKNOWN,
                                                 vtm.mouse.l, vtm.mouse.r);
@@ -89,19 +89,14 @@ bool Vtm:decodeVTMControl(const ReceivedSerialMessage& message)
     return true;
 }
 
-//return true if the key (k) is currently pressed
-bool Vtm:getKey(Rx::Key k) {
-    return static_cast<uint16_t>(k) & vtm.keys; 
-}
-
 //clears keyboard state and disables the robot
-void Vtm:resetKeys() {
-    vtm.keys = 0;
+void Vtm::resetKeys() {
+    vtm.key = 0;
     vtm.mouse.x = 0;
     vtm.mouse.y = 0;
     vtm.mouse.wheel = 0;
-    vtm.mouse.left = 0;
-    vtm.mouse.right = 0;
+    vtm.mouse.l = 0;
+    vtm.mouse.r = 0;
     drivers->commandMapper.handleKeyStateChange(0, tap::communication::serial::Remote::SwitchState::UNKNOWN,
         tap::communication::serial::Remote::SwitchState::UNKNOWN, false, false);
 }

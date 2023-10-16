@@ -9,7 +9,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build",
+            "command": "pipenv run scons build -j0",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -22,7 +22,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons run",
+            "command": "pipenv run scons run -j0",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -90,7 +90,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build profile=debug profiling=true",
+            "command": "pipenv run scons build profile=debug profiling=true -j0",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -103,7 +103,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons run profile=debug",
+            "command": "pipenv run scons run profile=debug -j0",
             "group": "build",
             "problemMatcher": [],
             "options": {

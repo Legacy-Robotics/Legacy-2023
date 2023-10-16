@@ -18,9 +18,9 @@ void SimpleSwerveCommand::initialize()
 void SimpleSwerveCommand::execute()
 {
     float_t x = 0, y = 0 , rot = 0;
-    y = drivers->vtm.getKey(Vtm::Key::W) - drivers->vtm.getKey(Vtm::Key::S);
-    x = drivers->vtm.getKey(Vtm::Key::A) - drivers->vtm.getKey(Vtm::Key::D);
-    rot = drivers->vtm.getKey(Vtm::Key::Q) - drivers->vtm.getKey(Vtm::Key::E);
+    y = drivers->vtm.keyPressed(Vtm::Key::W) - drivers->vtm.keyPressed(Vtm::Key::S);
+    x = drivers->vtm.keyPressed(Vtm::Key::A) - drivers->vtm.keyPressed(Vtm::Key::D);
+    rot = drivers->vtm.keyPressed(Vtm::Key::Q) - drivers->vtm.keyPressed(Vtm::Key::E);
     chassis->setDesiredOutput(x, y, rot);
 }
 
