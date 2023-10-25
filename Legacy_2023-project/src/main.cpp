@@ -102,8 +102,11 @@ int main()
             PROFILE(drivers->profiler, drivers->djiMotorTxHandler.encodeAndSendCanData, ());
             PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
         }
+        drivers->leds.set(tap::gpio::Leds::A, !drivers->vtm.keyPressed(tap::communication::serial::Vtm::Key::A));
         drivers->canRxHandler.pollCanData();
+        volatile int len = drivers->commandMapper.commandsToRun.size();
         modm::delay_us(10);
+        len = len + 1;
     }
     return 0;
 }
@@ -134,6 +137,5 @@ static void updateIo(src::Drivers *drivers)
     drivers->canRxHandler.pollCanData();
     drivers->refSerial.updateSerial();
     drivers->vtm.updateSerial();
-    drivers->remote.read();
     drivers->mpu6500.read();
 }

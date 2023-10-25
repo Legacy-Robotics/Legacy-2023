@@ -58,6 +58,7 @@ void Vtm::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
 //decode ref serial messages containing keyboard control data
 bool Vtm::decodeVTMControl(const ReceivedSerialMessage& message)
 {
+    
     //parse incoming serial data
     if (message.header.dataLength != 12) return false;
 
@@ -81,10 +82,12 @@ bool Vtm::decodeVTMControl(const ReceivedSerialMessage& message)
     */
 
     //update command scheduler key states
+    /*
     drivers->commandMapper.handleKeyStateChange(vtm.key,
                                                 tap::communication::serial::Remote::SwitchState::UNKNOWN, 
                                                 tap::communication::serial::Remote::SwitchState::UNKNOWN,
                                                 vtm.mouse.l, vtm.mouse.r);
+    */
 
     return true;
 }

@@ -67,7 +67,13 @@ class CommandMapping;
 class CommandMapper
 {
 public:
-    explicit CommandMapper(Drivers *drivers) : drivers(drivers) {}
+    explicit CommandMapper(Drivers *drivers) : drivers(drivers), commandsToRun() { 
+        commandsToRun = std::vector<CommandMapping *>();
+        volatile char buf[20] = {0};
+        sprintf((char*)buf, "%d", commandsToRun.size());
+        volatile int a = 4;
+        a = a + 1;
+    }
     DISALLOW_COPY_AND_ASSIGN(CommandMapper)
     mockable ~CommandMapper() = default;
 
@@ -105,6 +111,7 @@ public:
      *      `nullptr` of the index is out of bounds.
      */
     mockable const CommandMapping *getAtIndex(std::size_t index) const;
+    std::vector<CommandMapping *> commandsToRun;
 
 private:
     /**
@@ -114,7 +121,6 @@ private:
      * It ends up being slower to insert, but this is OK since we only insert at the beginning
      * of execution.
      */
-    std::vector<CommandMapping *> commandsToRun;
 
     Drivers *drivers;
 };  // class CommandMapper
