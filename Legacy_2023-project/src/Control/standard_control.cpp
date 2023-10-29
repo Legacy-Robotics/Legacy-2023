@@ -20,7 +20,7 @@
  *      and thus we must pass in the single statically allocated
  *      Drivers class to all of these objects.
  */
-src::driversFunc drivers = src::DoNotUse_getDrivers;
+src::driversFunc drivers_ = src::DoNotUse_getDrivers;
 
 using namespace tap;
 using namespace tap::control;
@@ -31,15 +31,15 @@ using namespace src::chassis;
 namespace StandardControl {
 
 // Define Subsystems Here
-ChassisSubsystem drivetrain(drivers());
+ChassisSubsystem drivetrain(drivers_());
 // Define Commands Here
-SimpleSwerveCommand omni(drivers(), &drivetrain);
+SimpleSwerveCommand omni(drivers_(), &drivetrain);
 
 // Define Command Mappings Here
 // Register Subsystems with drivers->commandScheduler.registerSubsystem(&subsystem_name);
-void registerSubsystems(src::Drivers* drivers)
+void registerSubsystems(src::Drivers* drivers_)
 {
-    drivers->commandScheduler.registerSubsystem(&drivetrain);
+    drivers_->commandScheduler.registerSubsystem(&drivetrain);
 }
 
 // Initialize Subsystems with subsystem.initialize();
@@ -49,19 +49,19 @@ void initializeSubsystems()
 }
 
 // Set Default Command with subsystem.setDefaultCommand(&command)
-void setDefaultCommands(src::Drivers* drivers)
+void setDefaultCommands(src::Drivers* drivers_)
 {
     drivetrain.setDefaultCommand(&omni);
 }
 
 // Set Commands scheduled on startup
-void startupCommands(src::Drivers* drivers)
+void startupCommands(src::Drivers* drivers_)
 {
 
 }
 
 // Register IO Mappings with drivers->commandMapper.addMap(&commandMapping)
-void registerIOMappings(src::Drivers* drivers)
+void registerIOMappings(src::Drivers* drivers_)
 {
 }
 
@@ -69,13 +69,13 @@ void registerIOMappings(src::Drivers* drivers)
 
 namespace src::Control
 {
-    void initializeSubsystemCommands(src::Drivers* drivers)
+    void initializeSubsystemCommands(src::Drivers* drivers_)
     {
         StandardControl::initializeSubsystems();
-        StandardControl::registerSubsystems(drivers);
-        StandardControl::setDefaultCommands(drivers);
-        StandardControl::startupCommands(drivers);
-        StandardControl::registerIOMappings(drivers);
+        StandardControl::registerSubsystems(drivers_);
+        StandardControl::setDefaultCommands(drivers_);
+        StandardControl::startupCommands(drivers_);
+        StandardControl::registerIOMappings(drivers_);
     }
 } //namespace src::Control
 

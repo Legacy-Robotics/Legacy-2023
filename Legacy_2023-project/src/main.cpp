@@ -19,8 +19,6 @@
 
 #ifdef PLATFORM_HOSTED
 
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::DISABLED
 
 /* hosted environment (simulator) includes --------------------------------- */
 #include <iostream>
@@ -28,6 +26,10 @@
 #include "tap/communication/tcp-server/tcp_server.hpp"
 #include "tap/motor/motorsim/sim_handler.hpp"
 #endif
+
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DISABLED
+#define USE_USBCON
 
 #include "tap/board/board.hpp"
 #include "robot_control.hpp"
@@ -56,6 +58,7 @@
 #include <ros/node_handle.h>
 #include "tap/communication/serial/uart.hpp"
 #include "tap/motor/dji_motor.hpp"
+#include "tap/communication/serial/uart.hpp"
 
 /* define timers here -------------------------------------------------------*/
 tap::arch::PeriodicMilliTimer sendMotorTimeout(2);
@@ -79,7 +82,7 @@ ros::ModmNodeHandle nh;
 
 
 std_msgs::UInt16 encoder_msg;
-ros::Publisher pub_encoder("/encoder", &encoder_msg);
+ros::Publisher pub_encoder("encoder", &encoder_msg);
 
 src::Drivers *drivers = src::DoNotUse_getDrivers();
 void message_cb(const std_msgs::Bool& msg) {
@@ -102,10 +105,10 @@ int main()
 
     Board::initialize();
     initializeIo(drivers);
+    drivers->uart.init<tap::communication::serial::Uart::UartPort::Uart7, 115200>();
+
     nh.initNode();
 
-	ros::Subscriber<std_msgs::Bool> sub_led("/led/one",   &message_cb);
-    nh.subscribe(sub_led);
     nh.advertise(pub_encoder);
 
     drivers->leds.set(tap::gpio::Leds::A, true);
@@ -124,24 +127,13 @@ int main()
 #endif
 
     
-
+    uint16_t i = 0;
     while (1)
     {
-        // do this as fast as you can
-        PROFILE(drivers->profiler, updateIo, (drivers));
-        if (sendMotorTimeout.execute())
-        {
-            PROFILE(drivers->profiler, drivers->mpu6500.periodicIMUUpdate, ());
-            PROFILE(drivers->profiler, drivers->commandScheduler.run, ());
-            PROFILE(drivers->profiler, drivers->djiMotorTxHandler.encodeAndSendCanData, ());
-            PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
-        }
-        drivers->leds.set(tap::gpio::Leds::A, !drivers->vtm.keyPressed(tap::communication::serial::Vtm::Key::A));
-        drivers->canRxHandler.pollCanData();
-
-        encoder_msg.data = rf_motor.getEncoderWrapped();
+        encoder_msg.data = i++;
         pub_encoder.publish(&encoder_msg);
 		nh.spinOnce();
+        modm::delay_ms(1000);
     }
     return 0;
 }
