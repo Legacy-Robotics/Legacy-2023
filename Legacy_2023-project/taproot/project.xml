@@ -21,7 +21,7 @@
     <option name="modm:platform:uart:6:buffer.rx">256</option>
     <option name="modm:platform:uart:6:buffer.tx">256</option>
     <option name="modm:platform:uart:7:buffer.tx">256</option>
-    <option name="modm:platform:uart:7:buffer.rx">256</option>
+    <option name="modm:platform:uart:7:buffer.rx">512</option>
     <option name="modm:platform:uart:8:buffer.tx">256</option>
     <option name="modm:platform:uart:8:buffer.rx">256</option>
 
@@ -60,6 +60,8 @@
     <module>modm:platform:uart:6</module>
     <module>modm:platform:adc:1</module>
     <module>modm:platform:spi:1</module>
+    <module>modm:ros</module>
+    <module>modm:communication:ros</module>
     <module>modm:platform:i2c:2</module>
     <module>modm:platform:timer:3</module>
     <module>modm:platform:timer:12</module>

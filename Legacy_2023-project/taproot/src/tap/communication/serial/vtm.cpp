@@ -58,7 +58,6 @@ void Vtm::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
 //decode ref serial messages containing keyboard control data
 bool Vtm::decodeVTMControl(const ReceivedSerialMessage& message)
 {
-    
     //parse incoming serial data
     if (message.header.dataLength != 12) return false;
 
@@ -68,18 +67,6 @@ bool Vtm::decodeVTMControl(const ReceivedSerialMessage& message)
     vtm.mouse.l = message.data[6];
     vtm.mouse.r = message.data[7];
     convertFromLittleEndian(&vtm.key, message.data + 8);
-
-    //ensure that disabled state is only toggled on keyup, so it isn't continually changed while holding
-    //Todo: fix this
-    /*
-    if (getKey(Rx::Key::X) && !VTMControlData.disableKeyPressed) {
-        VTMControlData.disableKeyPressed = true;
-    }
-    if (!getKey(Rx::Key::X) && VTMControlData.disableKeyPressed) {
-        VTMControlData.disableKeyPressed = false;
-        VTMControlData.controlDisabled = !VTMControlData.controlDisabled;
-    }
-    */
 
     //update command scheduler key states
     /*

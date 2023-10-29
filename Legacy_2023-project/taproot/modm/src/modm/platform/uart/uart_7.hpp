@@ -36,7 +36,7 @@ class Uart7 : public UartBase, public ::modm::Uart
 public:
 	using Hal = UartHal7;
 	// Expose jinja template parameters to be checked by e.g. drivers or application
-	static constexpr size_t RxBufferSize = 256;
+	static constexpr size_t RxBufferSize = 512;
 	static constexpr size_t TxBufferSize = 256;
 
 public:

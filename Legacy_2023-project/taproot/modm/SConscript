@@ -187,6 +187,7 @@ env.AppendUnique(CPPPATH=[
     abspath(r"ext\cmsis\core"),
     abspath(r"ext\cmsis\device"),
     abspath(r"ext\cmsis\dsp"),
+    abspath(r"ext\ros"),
     abspath(r"src"),
 ])
 
@@ -194,6 +195,8 @@ files = [
     env.File(r"ext\gcc\cabi.c"),
     env.File(r"ext\gcc\cxxabi.cpp"),
     env.File(r"ext\gcc\new_delete.cpp"),
+    env.File(r"ext\ros\duration.cpp"),
+    env.File(r"ext\ros\time.cpp"),
     env.File(r"ext\tlsf\tlsf.c"),
     env.File(r"src\modm\architecture\driver\atomic\flag.cpp"),
     env.File(r"src\modm\architecture\interface\can.cpp"),

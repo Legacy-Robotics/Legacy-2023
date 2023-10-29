@@ -46,8 +46,8 @@ void CommandMapper::handleKeyStateChange(
     // Make a new map state that represents the current state of the remote,
     // to be passed in to each of the CommandMappings.
     RemoteMapState mapstate;
-    mapstate.initLSwitch(tap::communication::serial::Remote::SwitchState::DOWN);
-    mapstate.initRSwitch(tap::communication::serial::Remote::SwitchState::DOWN);
+    mapstate.initLSwitch(leftSwitch);
+    mapstate.initRSwitch(rightSwitch);
     mapstate.initKeys(key);
     if (mouseL)
     {
@@ -57,12 +57,10 @@ void CommandMapper::handleKeyStateChange(
     {
         mapstate.initRMouseButton();
     }
-    volatile char buf[20] = {0};
-    sprintf((char*)buf, "%d", commandsToRun.size());
-    volatile size_t len = commandsToRun.size();
-    for (int i = 0; i < (int)commandsToRun.size(); ++i) 
+
+    for (CommandMapping *cmdMap : commandsToRun)
     {
-        commandsToRun[i]->executeCommandMapping(mapstate);
+        cmdMap->executeCommandMapping(mapstate);
     }
 }
 

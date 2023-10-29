@@ -18,6 +18,10 @@
  */
 
 #ifdef PLATFORM_HOSTED
+
+#undef	MODM_LOG_LEVEL
+#define	MODM_LOG_LEVEL modm::log::DISABLED
+
 /* hosted environment (simulator) includes --------------------------------- */
 #include <iostream>
 
@@ -45,6 +49,14 @@
 /* control includes ---------------------------------------------------------*/
 #include "tap/architecture/clock.hpp"
 
+/* ros includes ---------------------------------------------------------*/
+#include <modm/communication/ros.hpp>
+#include <std_msgs/UInt16.h>
+#include <std_msgs/Bool.h>
+#include <ros/node_handle.h>
+#include "tap/communication/serial/uart.hpp"
+#include "tap/motor/dji_motor.hpp"
+
 /* define timers here -------------------------------------------------------*/
 tap::arch::PeriodicMilliTimer sendMotorTimeout(2);
 // Place any sort of input/output initialization here. For example, place
@@ -55,6 +67,24 @@ static void initializeIo(src::Drivers *drivers);
 // very frequently. Use PeriodicMilliTimers if you don't want something to be
 // called as frequently.
 static void updateIo(src::Drivers *drivers);
+
+
+// ROS Stuff
+namespace ros
+{
+	using modmHardware = ModmHardware<modm::platform::Uart7>;
+	using ModmNodeHandle = NodeHandle_<modmHardware>;
+}
+ros::ModmNodeHandle nh;
+
+
+std_msgs::UInt16 encoder_msg;
+ros::Publisher pub_encoder("/encoder", &encoder_msg);
+
+src::Drivers *drivers = src::DoNotUse_getDrivers();
+void message_cb(const std_msgs::Bool& msg) {
+    drivers->leds.set(tap::gpio::Leds::A, !(msg.data));
+}
 
 int main()
 {
@@ -67,12 +97,16 @@ int main()
      *      robot loop we must access the singleton drivers to update
      *      IO states and run the scheduler.
      */
-    src::Drivers *drivers = src::DoNotUse_getDrivers();
     src::Control::initializeSubsystemCommands(drivers);
-
+    tap::motor::DjiMotor rf_motor = tap::motor::DjiMotor(drivers, tap::motor::MOTOR1, tap::can::CanBus::CAN_BUS1, true, "Front Right Wheel");
 
     Board::initialize();
     initializeIo(drivers);
+    nh.initNode();
+
+	ros::Subscriber<std_msgs::Bool> sub_led("/led/one",   &message_cb);
+    nh.subscribe(sub_led);
+    nh.advertise(pub_encoder);
 
     drivers->leds.set(tap::gpio::Leds::A, true);
     drivers->leds.set(tap::gpio::Leds::B, true);
@@ -104,9 +138,10 @@ int main()
         }
         drivers->leds.set(tap::gpio::Leds::A, !drivers->vtm.keyPressed(tap::communication::serial::Vtm::Key::A));
         drivers->canRxHandler.pollCanData();
-        volatile int len = drivers->commandMapper.commandsToRun.size();
-        modm::delay_us(10);
-        len = len + 1;
+
+        encoder_msg.data = rf_motor.getEncoderWrapped();
+        pub_encoder.publish(&encoder_msg);
+		nh.spinOnce();
     }
     return 0;
 }
