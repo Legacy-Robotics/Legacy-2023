@@ -86,7 +86,7 @@ ros::Publisher pub_encoder("encoder", &encoder_msg);
 
 src::Drivers *drivers = src::DoNotUse_getDrivers();
 void message_cb(const std_msgs::Bool& msg) {
-    drivers->leds.set(tap::gpio::Leds::A, !(msg.data));
+    drivers->leds.set(tap::gpio::Leds::B, msg.data);
 }
 
 int main()
@@ -105,10 +105,10 @@ int main()
 
     Board::initialize();
     initializeIo(drivers);
-    drivers->uart.init<tap::communication::serial::Uart::UartPort::Uart7, 115200>();
-
     nh.initNode();
 
+	ros::Subscriber<std_msgs::Bool> sub_led("/led/one", &message_cb);
+    nh.subscribe(sub_led);
     nh.advertise(pub_encoder);
 
     drivers->leds.set(tap::gpio::Leds::A, true);
@@ -126,14 +126,26 @@ int main()
     tap::communication::TCPServer::MainServer()->getConnection();
 #endif
 
-    
     uint16_t i = 0;
     while (1)
     {
+        PROFILE(drivers->profiler, updateIo, (drivers));
+        if (sendMotorTimeout.execute())
+        {
+            PROFILE(drivers->profiler, drivers->mpu6500.periodicIMUUpdate, ());
+            PROFILE(drivers->profiler, drivers->commandScheduler.run, ());
+            PROFILE(drivers->profiler, drivers->djiMotorTxHandler.encodeAndSendCanData, ());
+            PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
+        }
+        drivers->leds.set(tap::gpio::Leds::A, !drivers->vtm.keyPressed(tap::communication::serial::Vtm::Key::A));
+        drivers->canRxHandler.pollCanData();
         encoder_msg.data = i++;
-        pub_encoder.publish(&encoder_msg);
-		nh.spinOnce();
-        modm::delay_ms(1000);
+        if (i % 10000 == 0)
+        {
+            pub_encoder.publish(&encoder_msg);
+            nh.spinOnce();
+        }
+        modm::delay_us(10);
     }
     return 0;
 }
@@ -153,6 +165,8 @@ static void initializeIo(src::Drivers *drivers)
     drivers->terminalSerial.initialize();
     drivers->schedulerTerminalHandler.init();
     drivers->djiMotorTerminalSerialHandler.init();
+    //ROS UART port initialization
+    drivers->uart.init<tap::communication::serial::Uart::UartPort::Uart7, 115200>();
 }
 
 static void updateIo(src::Drivers *drivers)
