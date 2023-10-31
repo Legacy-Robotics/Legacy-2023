@@ -55,6 +55,7 @@
 #include <modm/communication/ros.hpp>
 #include <std_msgs/UInt16.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Float32.hpp>
 #include <ros/node_handle.h>
 #include "tap/communication/serial/uart.hpp"
 #include "tap/motor/dji_motor.hpp"
@@ -85,8 +86,13 @@ std_msgs::UInt16 encoder_msg;
 ros::Publisher pub_encoder("encoder", &encoder_msg);
 
 src::Drivers *drivers = src::DoNotUse_getDrivers();
-void message_cb(const std_msgs::Bool& msg) {
+void motor_state(const std_msgs::UInt& msg) {
     drivers->leds.set(tap::gpio::Leds::B, msg.data);
+}
+
+void motor_kp_callback(const std_msgs::Float32)
+{
+
 }
 
 int main()
@@ -137,11 +143,10 @@ int main()
             PROFILE(drivers->profiler, drivers->djiMotorTxHandler.encodeAndSendCanData, ());
             PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
         }
-        drivers->leds.set(tap::gpio::Leds::A, !drivers->vtm.keyPressed(tap::communication::serial::Vtm::Key::A));
         drivers->canRxHandler.pollCanData();
-        encoder_msg.data = i++;
-        if (i % 10000 == 0)
+        if (i % 5000 == 0)
         {
+            encoder_msg.data = rf_motor.getEncoderWrapped();
             pub_encoder.publish(&encoder_msg);
             nh.spinOnce();
         }
