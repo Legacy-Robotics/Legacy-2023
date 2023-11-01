@@ -53,13 +53,15 @@
 
 /* ros includes ---------------------------------------------------------*/
 #include <modm/communication/ros.hpp>
-#include <std_msgs/UInt16.h>
+#include <std_msgs/Int32.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float32.hpp>
 #include <ros/node_handle.h>
 #include "tap/communication/serial/uart.hpp"
 #include "tap/motor/dji_motor.hpp"
 #include "tap/communication/serial/uart.hpp"
+
+#include "tap/algorithms/simple_pid.hpp"
 
 /* define timers here -------------------------------------------------------*/
 tap::arch::PeriodicMilliTimer sendMotorTimeout(2);
@@ -72,6 +74,12 @@ static void initializeIo(src::Drivers *drivers);
 // called as frequently.
 static void updateIo(src::Drivers *drivers);
 
+src::Drivers *drivers = src::DoNotUse_getDrivers();
+
+//state variables
+SimplePIDConfig config = {0.0f, 0.0f, 0.0f, 5'000.0f, 10'000.0f, 0.0f, 0.0f};
+SimplePID pid = SimplePID(config);
+int32_t setpoint = 0;
 
 // ROS Stuff
 namespace ros
@@ -82,17 +90,46 @@ namespace ros
 ros::ModmNodeHandle nh;
 
 
-std_msgs::UInt16 encoder_msg;
+std_msgs::Int32 encoder_msg;
 ros::Publisher pub_encoder("encoder", &encoder_msg);
 
-src::Drivers *drivers = src::DoNotUse_getDrivers();
 void motor_state(const std_msgs::UInt& msg) {
     drivers->leds.set(tap::gpio::Leds::B, msg.data);
 }
 
-void motor_kp_callback(const std_msgs::Float32)
+void motor_kp_callback(const std_msgs::Float32 &msg)
 {
+    pid.setP(msg.data);
+}
 
+void motor_ki_callback(const std_msgs::Float32 &msg)
+{
+    pid.setI(msg.data);
+}
+
+void motor_kd_callback(const std_msgs::Float32 &msg)
+{
+    pid.setD(msg.data);
+}
+
+void motor_maxi_callback(const std_msgs::Float32 &msg)
+{
+    pid.setMaxICumulative(msg.data);
+}
+
+void motor_max_out_callback(const std_msgs::Float32 &msg)
+{
+    pid.setMaxOutput(msg.data);
+}
+
+void motor_dead_callback(const std_msgs::Float32 &msg)
+{
+    pid.setErrDeadzone(msg.data);
+}
+
+void motor_setpoint_callback(const std_msgs::Float32 &msg)
+{
+    setpoint = msg; 
 }
 
 int main()
@@ -113,18 +150,23 @@ int main()
     initializeIo(drivers);
     nh.initNode();
 
-	ros::Subscriber<std_msgs::Bool> sub_led("/led/one", &message_cb);
-    nh.subscribe(sub_led);
-    nh.advertise(pub_encoder);
+	ros::Subscriber<std_msgs::Float32> sub_kp("/constants/kp", &motor_kp_callback);
+	ros::Subscriber<std_msgs::Float32> sub_ki("/constants/ki", &motor_ki_callback);
+	ros::Subscriber<std_msgs::Float32> sub_kd("/constants/kd", &motor_kd_callback);
+	ros::Subscriber<std_msgs::Float32> sub_maxi("/constants/maxi", &motor_maxi_callback);
+	ros::Subscriber<std_msgs::Float32> sub_maxo("/constants/maxo", &motor_max_out_callback);
+	ros::Subscriber<std_msgs::Float32> sub_dead("/constants/dead", &motor_dead_callback);
+	ros::Subscriber<std_msgs::Float32> sub_setp("/setpoint", &motor_setpoint_callback);
 
-    drivers->leds.set(tap::gpio::Leds::A, true);
-    drivers->leds.set(tap::gpio::Leds::B, true);
-    drivers->leds.set(tap::gpio::Leds::C, true);
-    drivers->leds.set(tap::gpio::Leds::D, true);
-    drivers->leds.set(tap::gpio::Leds::E, true);
-    drivers->leds.set(tap::gpio::Leds::F, true);
-    drivers->leds.set(tap::gpio::Leds::G, true);
-    drivers->leds.set(tap::gpio::Leds::H, true);
+    nh.subscribe(sub_kp);
+    nh.subscribe(sub_ki);
+    nh.subscribe(sub_kd);
+    nh.subscribe(sub_maxi);
+    nh.subscribe(sub_maxo);
+    nh.subscribe(sub_dead);
+    nh.subscribe(sub_setp);
+
+    nh.advertise(pub_encoder);
 
 #ifdef PLATFORM_HOSTED
     tap::motorsim::SimHandler::resetMotorSims();
@@ -139,16 +181,24 @@ int main()
         if (sendMotorTimeout.execute())
         {
             PROFILE(drivers->profiler, drivers->mpu6500.periodicIMUUpdate, ());
-            PROFILE(drivers->profiler, drivers->commandScheduler.run, ());
+            //PROFILE(drivers->profiler, drivers->commandScheduler.run, ());
             PROFILE(drivers->profiler, drivers->djiMotorTxHandler.encodeAndSendCanData, ());
-            PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
+            //PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
         }
         drivers->canRxHandler.pollCanData();
+
+        //slow down the ros communication, too fast will mess it up
         if (i % 5000 == 0)
         {
-            encoder_msg.data = rf_motor.getEncoderWrapped();
+            encoder_msg.data = rf_motor.getShaftRPM();
             pub_encoder.publish(&encoder_msg);
             nh.spinOnce();
+        }
+
+        //encoder data arrives a 1 kHz, run at 1/4 that
+        if (i % 4000 == 0)
+        {
+            rf_motor.setDesiredOutput(pid.runControllerDerivateError(setpoint - rf_motor.getShaftRPM()));
         }
         modm::delay_us(10);
     }
@@ -172,6 +222,11 @@ static void initializeIo(src::Drivers *drivers)
     drivers->djiMotorTerminalSerialHandler.init();
     //ROS UART port initialization
     drivers->uart.init<tap::communication::serial::Uart::UartPort::Uart7, 115200>();
+    //turn off all LEDs
+    for (int led = tap::gpio::Leds::A; led != tap::gpio::Leds::Green; led++)
+    {
+        drivers->leds.set(led, true);
+    }
 }
 
 static void updateIo(src::Drivers *drivers)
