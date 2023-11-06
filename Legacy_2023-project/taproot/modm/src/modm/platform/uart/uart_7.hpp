@@ -37,7 +37,7 @@ public:
 	using Hal = UartHal7;
 	// Expose jinja template parameters to be checked by e.g. drivers or application
 	static constexpr size_t RxBufferSize = 512;
-	static constexpr size_t TxBufferSize = 256;
+	static constexpr size_t TxBufferSize = 512;
 
 public:
 	template< template<Peripheral _> class... Signals >

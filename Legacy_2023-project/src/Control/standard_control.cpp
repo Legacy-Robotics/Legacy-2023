@@ -31,27 +31,21 @@ using namespace src::chassis;
 namespace StandardControl {
 
 // Define Subsystems Here
-ChassisSubsystem drivetrain(drivers_());
-// Define Commands Here
-SimpleSwerveCommand omni(drivers_(), &drivetrain);
 
 // Define Command Mappings Here
 // Register Subsystems with drivers->commandScheduler.registerSubsystem(&subsystem_name);
 void registerSubsystems(src::Drivers* drivers_)
 {
-    drivers_->commandScheduler.registerSubsystem(&drivetrain);
 }
 
 // Initialize Subsystems with subsystem.initialize();
 void initializeSubsystems()
 {
-    drivetrain.initialize();
 }
 
 // Set Default Command with subsystem.setDefaultCommand(&command)
 void setDefaultCommands(src::Drivers* drivers_)
 {
-    drivetrain.setDefaultCommand(&omni);
 }
 
 // Set Commands scheduled on startup
